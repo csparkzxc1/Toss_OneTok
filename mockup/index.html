@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>한줄톡 — UI 목업</title>
+    <style>
+      :root {
+        --blue50: #e6f0ff;
+        --blue100: #bfd8ff;
+        --blue500: #0064ff;
+        --blue600: #0052cc;
+        --blue700: #0040a0;
+        --gray50: #f9fafb;
+        --gray100: #f2f4f6;
+        --gray200: #e5e8eb;
+        --gray300: #d1d6db;
+        --gray400: #b0b8c1;
+        --gray500: #8b95a1;
+        --gray600: #6b7684;
+        --gray700: #4e5968;
+        --gray800: #333d4b;
+        --gray900: #191f28;
+        --success: #1ab759;
+        --warning: #ffb020;
+        --danger: #f04452;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Apple SD Gothic Neo',
+          'Noto Sans KR', sans-serif;
+        background: linear-gradient(180deg, #eef2f7 0%, #dde4ee 100%);
+        color: var(--gray900);
+        -webkit-font-smoothing: antialiased;
+      }
+      .stage {
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 48px 24px 80px;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      .header h1 {
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        margin: 0 0 8px;
+      }
+      .header p {
+        margin: 0;
+        color: var(--gray600);
+        font-size: 15px;
+      }
+      .grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 32px 24px;
+        justify-content: center;
+      }
+      .phone {
+        width: 280px;
+        height: 580px;
+        background: #fff;
+        border-radius: 36px;
+        border: 6px solid #1a1f2a;
+        box-shadow:
+          0 20px 40px rgba(0, 0, 0, 0.18),
+          0 4px 8px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+      .phone .notch {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 18px;
+        background: #1a1f2a;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+        z-index: 5;
+      }
+      .phone .statusbar {
+        padding: 10px 20px 4px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--gray800);
+      }
+      .phone-label {
+        text-align: center;
+        margin-top: 12px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--gray700);
+      }
+      .screen {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .screen::-webkit-scrollbar { width: 4px; }
+      .screen::-webkit-scrollbar-thumb { background: var(--gray200); border-radius: 4px; }
+
+      /* 공용 ---------------- */
+      .brand { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+      .subtitle { color: var(--gray600); font-size: 13px; margin-top: 2px; }
+      .btn {
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        border: none;
+      }
+      .btn.primary { background: var(--blue500); color: #fff; }
+      .btn.secondary { background: var(--blue50); color: var(--blue600); }
+      .btn.ghost { background: transparent; color: var(--gray700); }
+      .btn.lg { height: 52px; font-size: 15px; border-radius: 14px; }
+      .btn.sm { height: 36px; font-size: 12px; padding: 0 12px; }
+      .card {
+        background: #fff;
+        border: 1px solid var(--gray100);
+        border-radius: 16px;
+        padding: 14px;
+      }
+      .card.elevated {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      }
+      .card.muted { background: var(--gray50); }
+      .card.blue {
+        background: var(--blue50);
+        border-color: var(--blue100);
+      }
+      .chip {
+        height: 32px;
+        padding: 0 14px;
+        border-radius: 999px;
+        background: var(--gray50);
+        border: 1px solid var(--gray200);
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--gray700);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .chip.selected {
+        background: var(--blue500);
+        color: #fff;
+        border-color: var(--blue500);
+      }
+      .chip .badge { color: var(--warning); font-size: 10px; }
+
+      /* 홈 ---------------- */
+      .home-usage .label { font-size: 12px; font-weight: 700; color: var(--blue600); }
+      .home-usage .value { font-size: 22px; font-weight: 800; color: var(--blue700); }
+      .home-quick-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .quick {
+        background: var(--gray50);
+        border: 1px solid var(--gray100);
+        border-radius: 14px;
+        padding: 14px;
+      }
+      .quick .emoji { font-size: 22px; }
+      .quick .ttl { font-weight: 700; font-size: 13px; margin-top: 4px; }
+      .quick .sub { color: var(--gray600); font-size: 11px; }
+      .tip-card { background: var(--gray50); }
+      .tip-badge { color: var(--warning); font-weight: 700; font-size: 12px; }
+      .tip-body { color: var(--gray700); font-size: 12px; margin-top: 4px; line-height: 1.5; }
+
+      /* 작성 ---------------- */
+      .heading { font-size: 18px; font-weight: 800; color: var(--gray900); margin-top: 4px; }
+      .sit-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+      .sit {
+        background: var(--gray50);
+        border: 1px solid var(--gray100);
+        border-radius: 12px;
+        aspect-ratio: 1 / 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+      }
+      .sit.selected {
+        background: var(--blue50);
+        border-color: var(--blue500);
+      }
+      .sit .emoji { font-size: 22px; }
+      .sit .lab { font-size: 11px; font-weight: 700; color: var(--gray700); }
+      .sit.selected .lab { color: var(--blue700); }
+      .tone-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+      .tone-row::-webkit-scrollbar { display: none; }
+      .input-wrap {
+        background: var(--gray50);
+        border: 1px solid var(--gray100);
+        border-radius: 12px;
+        padding: 12px;
+      }
+      .input-wrap textarea {
+        width: 100%;
+        border: none;
+        background: transparent;
+        resize: none;
+        font: inherit;
+        font-size: 13px;
+        color: var(--gray900);
+        outline: none;
+        min-height: 70px;
+      }
+      .counter { text-align: right; color: var(--gray500); font-size: 11px; }
+      .footer-bar {
+        position: sticky;
+        bottom: 0;
+        background: #fff;
+        padding: 10px 0 4px;
+        border-top: 1px solid var(--gray100);
+        margin: 0 -16px -16px;
+        padding: 12px 16px;
+      }
+
+      /* 결과 ---------------- */
+      .candidate {
+        background: #fff;
+        border: 1px solid var(--gray100);
+        border-radius: 16px;
+        padding: 14px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+      .candidate .num {
+        color: var(--blue600);
+        font-weight: 700;
+        font-size: 12px;
+        margin-bottom: 6px;
+      }
+      .candidate .body {
+        color: var(--gray900);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+      .candidate .actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 10px;
+      }
+      .copy-btn {
+        background: var(--blue50);
+        color: var(--blue600);
+        border: none;
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-weight: 700;
+        font-size: 12px;
+      }
+      .exhausted-card {
+        background: var(--gray50);
+        border-radius: 16px;
+        padding: 14px;
+        margin-top: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .exhausted-card .ttl { font-size: 16px; font-weight: 800; color: var(--gray900); }
+      .exhausted-card .sub { font-size: 12px; color: var(--gray600); }
+
+      /* 히스토리 (잠김) ---------------- */
+      .gate {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 10px;
+        padding: 24px 16px;
+      }
+      .gate .lock { font-size: 44px; }
+      .gate .ttl { font-size: 18px; font-weight: 800; color: var(--gray900); }
+      .gate .body { font-size: 13px; color: var(--gray600); line-height: 1.5; }
+
+      /* 페이월 ---------------- */
+      .hero {
+        text-align: center;
+        padding: 12px 0 4px;
+      }
+      .hero .star { font-size: 40px; }
+      .hero .ttl { font-size: 22px; font-weight: 800; color: var(--gray900); margin-top: 4px; }
+      .hero .sub { font-size: 12px; color: var(--gray600); margin-top: 2px; }
+      .benefit {
+        background: var(--gray50);
+        border: 1px solid var(--gray100);
+        border-radius: 14px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .benefit .ico { font-size: 20px; width: 28px; text-align: center; }
+      .benefit .ttl { font-size: 13px; font-weight: 700; }
+      .benefit .body { font-size: 11px; color: var(--gray600); margin-top: 2px; }
+      .price {
+        background: var(--blue50);
+        border: 1px solid var(--blue100);
+        border-radius: 16px;
+        padding: 14px;
+      }
+      .price .badge {
+        display: inline-block;
+        background: var(--warning);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 800;
+        padding: 2px 8px;
+        border-radius: 999px;
+      }
+      .price .big { font-size: 22px; font-weight: 800; margin-top: 6px; }
+      .price .sm { font-size: 11px; color: var(--gray600); }
+      .price-alt {
+        background: #fff;
+        border: 1px solid var(--gray100);
+        border-radius: 16px;
+        padding: 14px;
+      }
+      .disclaimer {
+        font-size: 10px;
+        color: var(--gray500);
+        text-align: center;
+        line-height: 1.5;
+        margin-top: 4px;
+      }
+
+      .footnote {
+        text-align: center;
+        margin-top: 32px;
+        color: var(--gray500);
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <div class="header">
+        <h1>한줄톡 — UI 목업</h1>
+        <p>토스 디자인 토큰 그대로 적용한 5개 화면 미리보기</p>
+      </div>
+
+      <div class="grid">
+        <!-- 1. 홈 -->
+        <div>
+          <div class="phone">
+            <div class="notch"></div>
+            <div class="statusbar"><span>9:41</span><span>● ● ●</span></div>
+            <div class="screen">
+              <div>
+                <div class="brand">한줄톡</div>
+                <div class="subtitle">막막한 메시지, 한 줄로 바로 보내요.</div>
+              </div>
+              <div class="card blue elevated home-usage">
+                <div class="label">오늘 남은 무료 횟수</div>
+                <div class="value">3회</div>
+              </div>
+              <button class="btn primary lg">새 메시지 만들기</button>
+              <div class="home-quick-row">
+                <div class="quick">
+                  <div class="emoji">📚</div>
+                  <div class="ttl">히스토리</div>
+                  <div class="sub">최근 만든 메시지</div>
+                </div>
+                <div class="quick">
+                  <div class="emoji">✨</div>
+                  <div class="ttl">프리미엄</div>
+                  <div class="sub">무제한 + 고급 톤</div>
+                </div>
+              </div>
+              <div class="card tip-card">
+                <div class="tip-badge">💡 팁</div>
+                <div class="tip-body">
+                  상황과 톤만 고르면 AI가 메시지 후보 3개를 만들어요. 마음에 드는 후보를 골라 바로
+                  복사하세요.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">① 홈</div>
+        </div>
+
+        <!-- 2. 작성 -->
+        <div>
+          <div class="phone">
+            <div class="notch"></div>
+            <div class="statusbar"><span>9:41</span><span>● ● ●</span></div>
+            <div class="screen">
+              <div class="heading">어떤 상황이에요?</div>
+              <div class="sit-grid">
+                <div class="sit selected"><div class="emoji">🙅</div><div class="lab">거절</div></div>
+                <div class="sit"><div class="emoji">🙏</div><div class="lab">사과</div></div>
+                <div class="sit"><div class="emoji">🤝</div><div class="lab">부탁</div></div>
+                <div class="sit"><div class="emoji">💝</div><div class="lab">감사</div></div>
+                <div class="sit"><div class="emoji">🎉</div><div class="lab">축하</div></div>
+                <div class="sit"><div class="emoji">🕊️</div><div class="lab">조의</div></div>
+                <div class="sit"><div class="emoji">👋</div><div class="lab">소개</div></div>
+                <div class="sit"><div class="emoji">💬</div><div class="lab">답장</div></div>
+                <div class="sit"><div class="emoji">💔</div><div class="lab">이별</div></div>
+                <div class="sit"><div class="emoji">🌱</div><div class="lab">화해</div></div>
+                <div class="sit"><div class="emoji">📣</div><div class="lab">공지</div></div>
+                <div class="sit"><div class="emoji">✍️</div><div class="lab">기타</div></div>
+              </div>
+              <div class="heading">톤은?</div>
+              <div class="tone-row">
+                <span class="chip selected">정중</span>
+                <span class="chip">친근</span>
+                <span class="chip">위트</span>
+                <span class="chip">단호</span>
+                <span class="chip">따뜻</span>
+                <span class="chip">비즈니스 <span class="badge">✨</span></span>
+                <span class="chip">연애 <span class="badge">✨</span></span>
+              </div>
+              <div class="heading">한 줄로 알려주세요</div>
+              <div class="input-wrap">
+                <textarea readonly>친한 선배 결혼식인데 일정 안돼서 못 감</textarea>
+                <div class="counter">22/300</div>
+              </div>
+            </div>
+            <div style="padding: 10px 16px 14px; border-top: 1px solid var(--gray100)">
+              <button class="btn primary lg" style="width: 100%">메시지 만들기</button>
+            </div>
+          </div>
+          <div class="phone-label">② 상황·톤 선택</div>
+        </div>
+
+        <!-- 3. 결과 -->
+        <div>
+          <div class="phone">
+            <div class="notch"></div>
+            <div class="statusbar"><span>9:41</span><span>● ● ●</span></div>
+            <div class="screen">
+              <div class="heading">이런 메시지 어때요?</div>
+              <div style="font-size: 12px; color: var(--gray600)">
+                마음에 드는 후보를 골라 바로 복사할 수 있어요.
+              </div>
+              <div class="candidate">
+                <div class="num">후보 1</div>
+                <div class="body">
+                  선배, 결혼 진심으로 축하드려요! 그날 일정이 도저히 안 맞아서 직접 가지 못해 너무
+                  아쉽네요. 마음만이라도 꼭 전달드릴게요.
+                </div>
+                <div class="actions"><button class="copy-btn">📋 복사</button></div>
+              </div>
+              <div class="candidate">
+                <div class="num">후보 2</div>
+                <div class="body">
+                  선배 결혼식이라는 소식 듣고 정말 기뻤는데, 그날 빠질 수 없는 일정이 잡혀 있어
+                  참석이 어려울 것 같아요. 너무 죄송하고 축하 인사 따로 드릴게요.
+                </div>
+                <div class="actions"><button class="copy-btn">📋 복사</button></div>
+              </div>
+              <div class="candidate">
+                <div class="num">후보 3</div>
+                <div class="body">
+                  선배 결혼 정말 축하드려요. 직접 못 가서 너무 아쉬워요. 식 잘 마치시고 행복한
+                  소식만 가득하시길 바랄게요.
+                </div>
+                <div class="actions"><button class="copy-btn">📋 복사</button></div>
+              </div>
+              <button class="btn secondary" style="margin-top: 4px">🔄 이 톤으로 다시 만들기</button>
+              <div class="exhausted-card">
+                <div class="ttl">오늘은 다 썼어요</div>
+                <div class="sub">광고를 보면 +1회, 프리미엄을 구독하면 무제한이에요.</div>
+                <button class="btn primary">광고 보고 +1회 받기 (오늘 5회 남음)</button>
+                <button class="btn ghost">무제한으로 사용하기</button>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">③ 결과</div>
+        </div>
+
+        <!-- 4. 히스토리(잠김) -->
+        <div>
+          <div class="phone">
+            <div class="notch"></div>
+            <div class="statusbar"><span>9:41</span><span>● ● ●</span></div>
+            <div class="screen">
+              <div class="gate">
+                <div class="lock">🔒</div>
+                <div class="ttl">히스토리는 프리미엄 기능이에요</div>
+                <div class="body">
+                  프리미엄을 구독하면 만든 메시지를 모두 모아 다시 볼 수 있어요.
+                </div>
+                <button class="btn primary lg" style="width: 100%; margin-top: 8px">
+                  프리미엄 보기
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">④ 히스토리 (무료 사용자)</div>
+        </div>
+
+        <!-- 5. 페이월 -->
+        <div>
+          <div class="phone">
+            <div class="notch"></div>
+            <div class="statusbar"><span>9:41</span><span>● ● ●</span></div>
+            <div class="screen">
+              <div class="hero">
+                <div class="star">✨</div>
+                <div class="ttl">한줄톡 프리미엄</div>
+                <div class="sub">매일 막히는 메시지, 바로바로 보내세요.</div>
+              </div>
+              <div class="benefit">
+                <div class="ico">∞</div>
+                <div>
+                  <div class="ttl">무제한 사용</div>
+                  <div class="body">하루 횟수 제한 없이 메시지를 만들 수 있어요.</div>
+                </div>
+              </div>
+              <div class="benefit">
+                <div class="ico">✨</div>
+                <div>
+                  <div class="ttl">고급 톤 해제</div>
+                  <div class="body">비즈니스 / 연애 / 사투리 톤을 사용할 수 있어요.</div>
+                </div>
+              </div>
+              <div class="benefit">
+                <div class="ico">📚</div>
+                <div>
+                  <div class="ttl">히스토리 저장</div>
+                  <div class="body">만든 메시지를 모아 다시 볼 수 있어요.</div>
+                </div>
+              </div>
+              <div class="price">
+                <span class="badge">33% 할인</span>
+                <div class="big">연간 ₩24,000</div>
+                <div class="sm">월 약 2,000원 꼴</div>
+                <button class="btn primary lg" style="width: 100%; margin-top: 10px">
+                  연간 구독하기
+                </button>
+              </div>
+              <div class="price-alt">
+                <div style="font-size: 18px; font-weight: 800">월간 ₩2,900</div>
+                <button class="btn secondary" style="width: 100%; margin-top: 8px">
+                  월간 구독하기
+                </button>
+              </div>
+              <div class="disclaimer">
+                정기결제는 토스 인앱 설정에서 언제든 해지할 수 있어요.
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">⑤ 페이월</div>
+        </div>
+      </div>
+
+      <div class="footnote">
+        Toss design tokens · React Native + Granite · 한줄톡 v0.1
+      </div>
+    </div>
+  </body>
+</html>
