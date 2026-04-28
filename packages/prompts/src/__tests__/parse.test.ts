@@ -1,39 +1,41 @@
 import { describe, expect, it } from 'vitest';
-import { parseModelOutput } from '../parse.js';
+import { parseWordsOutput } from '../parse.js';
 
-describe('parseModelOutput', () => {
-  it('parses valid pure JSON', () => {
-    const raw = '{"candidates": ["메시지1", "메시지2", "메시지3"]}';
-    const r = parseModelOutput(raw);
+describe('parseWordsOutput', () => {
+  it('순수 JSON 파싱', () => {
+    const raw = '{"words":[{"word":"김치","hint":"빨간 발효 음식","difficulty":1}]}';
+    const r = parseWordsOutput(raw);
     expect(r.ok).toBe(true);
-    expect(r.candidates).toEqual(['메시지1', '메시지2', '메시지3']);
+    expect(r.words).toHaveLength(1);
+    expect(r.words?.[0]?.word).toBe('김치');
   });
 
-  it('extracts JSON from text with leading/trailing noise', () => {
-    const raw = '여기 결과입니다:\n{"candidates": ["a", "b", "c"]}\n끝.';
-    const r = parseModelOutput(raw);
+  it('주변 텍스트가 있어도 JSON만 추출', () => {
+    const raw = '여기 결과:\n{"words":[{"word":"치킨","hint":"맥주의 친구","difficulty":1}]}\n끝.';
+    const r = parseWordsOutput(raw);
     expect(r.ok).toBe(true);
-    expect(r.candidates).toEqual(['a', 'b', 'c']);
+    expect(r.words?.[0]?.word).toBe('치킨');
   });
 
-  it('rejects when fewer than 3 candidates', () => {
-    const r = parseModelOutput('{"candidates": ["a", "b"]}');
+  it('빈 입력 거부', () => {
+    expect(parseWordsOutput('').ok).toBe(false);
+    expect(parseWordsOutput('   ').ok).toBe(false);
+  });
+
+  it('잘못된 JSON 거부', () => {
+    expect(parseWordsOutput('not json').ok).toBe(false);
+  });
+
+  it('스키마 미일치 거부 (난이도 4)', () => {
+    const r = parseWordsOutput('{"words":[{"word":"치킨","hint":"맥주","difficulty":4}]}');
     expect(r.ok).toBe(false);
     expect(r.error).toBe('schema_mismatch');
   });
 
-  it('rejects malformed JSON', () => {
-    const r = parseModelOutput('not json');
+  it('스키마 미일치 거부 (글자수 6)', () => {
+    const r = parseWordsOutput(
+      '{"words":[{"word":"가나다라마바","hint":"긴 단어","difficulty":1}]}',
+    );
     expect(r.ok).toBe(false);
-  });
-
-  it('rejects empty', () => {
-    expect(parseModelOutput('').ok).toBe(false);
-    expect(parseModelOutput('   ').ok).toBe(false);
-  });
-
-  it('trims whitespace inside candidates', () => {
-    const r = parseModelOutput('{"candidates":["  hi  ","there","ok"]}');
-    expect(r.candidates?.[0]).toBe('hi');
   });
 });

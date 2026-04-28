@@ -1,6 +1,14 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
-import { Animated, StyleSheet, Text } from 'react-native';
 import { colors, radius, spacing, typography } from '@/design/tokens';
+import {
+  type ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { Animated, StyleSheet, Text } from 'react-native';
 
 interface ToastState {
   message: string;
@@ -17,12 +25,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const [toast, setToast] = useState<ToastState | null>(null);
   const opacity = useRef(new Animated.Value(0)).current;
 
-  const show = useCallback<ToastContextValue['show']>(
-    (message, variant = 'default') => {
-      setToast({ message, variant });
-    },
-    [],
-  );
+  const show = useCallback<ToastContextValue['show']>((message, variant = 'default') => {
+    setToast({ message, variant });
+  }, []);
 
   useEffect(() => {
     if (!toast) return;

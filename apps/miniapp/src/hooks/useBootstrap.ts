@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { syncAuth, verifyIap } from '@/api/client';
 import { getDeviceId } from '@/lib/deviceId';
 import { useSessionStore } from '@/stores/sessionStore';
 import { getCurrentUser } from '@/toss/auth';
 import { restorePendingOrders } from '@/toss/iap';
-import { syncAuth, verifyIap } from '@/api/client';
+import { useEffect, useState } from 'react';
 
 export function useBootstrap() {
   const [ready, setReady] = useState(false);

@@ -1,7 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
 import { getUsage } from '@/api/client';
 import { useSessionStore } from '@/stores/sessionStore';
 import { useUsageStore } from '@/stores/usageStore';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 export function useUsage() {

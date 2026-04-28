@@ -1,6 +1,6 @@
+import { colors, spacing, typography } from '@/design/tokens';
 import { Component, type ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { colors, spacing, typography } from '@/design/tokens';
 
 interface Props {
   children: ReactNode;
@@ -13,7 +13,7 @@ interface State {
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-  state: State = { hasError: false };
+  override state: State = { hasError: false };
 
   static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };

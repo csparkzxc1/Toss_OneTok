@@ -1,0 +1,41 @@
+import type { CategorySeed } from '../types.js';
+
+// 아이돌 카테고리는 장수 그룹/솔로 위주. 본명·특정 멤버는 가급적 피함.
+export const IDOL: CategorySeed = {
+  category: 'idol',
+  words: [
+    { word: '방탄소년단', hint: '7인조 글로벌 보이그룹', difficulty: 1 },
+    { word: '블랙핑크', hint: '4인조 걸그룹, 멤버 4명 모두 글로벌', difficulty: 1 },
+    { word: '뉴진스', hint: '민희진이 만든 5인조 걸그룹', difficulty: 1 },
+    { word: '에스파', hint: 'SM 4인조 걸그룹, 광야', difficulty: 1 },
+    { word: '아이브', hint: '6인조 걸그룹, 안유진 장원영', difficulty: 1 },
+    { word: '르세라핌', hint: '하이브 5인조 걸그룹', difficulty: 1 },
+    { word: '있지', hint: 'JYP 5인조 걸그룹', difficulty: 1, alternates: ['itzy'] },
+    { word: '트와이스', hint: 'JYP 9인조 걸그룹', difficulty: 1 },
+    { word: '레드벨벳', hint: 'SM 5인조 걸그룹', difficulty: 1 },
+    { word: '소녀시대', hint: '데뷔 2007년 9인조 걸그룹', difficulty: 1 },
+    { word: '엑소', hint: 'SM 보이그룹, 우리는 하나', difficulty: 1 },
+    { word: '세븐틴', hint: '13인조 보이그룹, 자체제작', difficulty: 1 },
+    { word: '엔시티', hint: 'SM 보이그룹 시리즈', difficulty: 1 },
+    {
+      word: '투바투',
+      hint: '하이브 5인조 보이그룹의 줄임말',
+      difficulty: 2,
+      alternates: ['TXT', 'tomorrowxtogether'],
+    },
+    { word: '에이티즈', hint: 'KQ 8인조 보이그룹', difficulty: 1 },
+    { word: '아이유', hint: '국민 여동생, 솔로 가수', difficulty: 1 },
+    { word: '태연', hint: '소녀시대 메인보컬', difficulty: 1 },
+    { word: '청하', hint: '솔로 댄스 가수', difficulty: 1 },
+    { word: '백예린', hint: '15&으로 데뷔, 솔로 가수', difficulty: 2 },
+    { word: '지드래곤', hint: '빅뱅 리더, GD', difficulty: 1 },
+    { word: '태양', hint: '빅뱅의 메인보컬', difficulty: 1 },
+    { word: '정국', hint: '방탄소년단 막내 멤버', difficulty: 1 },
+    { word: '엠넷', hint: '아이돌 오디션 채널', difficulty: 1 },
+    { word: '연습생', hint: '데뷔를 준비하는 사람', difficulty: 1 },
+    { word: '컴백', hint: '신곡 발매와 활동 재개', difficulty: 1 },
+    { word: '팬덤', hint: '특정 아티스트의 팬 집단', difficulty: 1 },
+    { word: '응원봉', hint: '콘서트에서 흔드는 막대', difficulty: 1 },
+    { word: '음악방송', hint: '매주 신곡을 무대로 보여주는 방송', difficulty: 1 },
+  ],
+};

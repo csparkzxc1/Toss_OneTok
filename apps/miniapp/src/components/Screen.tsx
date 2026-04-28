@@ -1,6 +1,6 @@
+import { colors, spacing } from '@/design/tokens';
 import type { ReactNode } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
-import { colors, spacing } from '@/design/tokens';
 
 interface Props {
   children: ReactNode;

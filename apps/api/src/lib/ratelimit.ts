@@ -1,9 +1,9 @@
-import { Ratelimit } from '@upstash/ratelimit';
 import {
   BONUS_DAILY_LIMIT,
   FREE_DAILY_LIMIT_ANON,
   FREE_DAILY_LIMIT_LOGGED_IN,
-} from '@hanjul-tok/shared';
+} from '@choseong-run/shared';
+import { Ratelimit } from '@upstash/ratelimit';
 import { getRedis } from './redis.js';
 
 let ipLimiter: Ratelimit | null = null;

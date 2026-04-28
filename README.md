@@ -1,17 +1,27 @@
-# 한줄톡 (Hanjul-Tok)
+# 초성런 (Choseong Run)
 
-> 한국인이 메시지 쓰기 막막한 순간, 상황 + 톤만 고르면 AI가 후보 3개를 즉시 생성해주는 토스 인앱 미니앱.
+> 한국어 초성(예: ㄱㅊㅈㄱ)을 보고 30초 안에 단어(김치찌개)를 맞히는 1인 캐주얼 게임. 토스 인앱 미니앱.
+
+## 한 게임 = 30초
+
+```
+카테고리 표시 → 초성 + 힌트 → 한글 입력 → 즉시 채점
+정답: +점수 / 콤보+1 / 햅틱 light
+오답: 콤보 리셋 / 1초 페널티 / 햅틱 medium
+5콤보마다: +5초 보너스 + 화면 빛남 + 햅틱 heavy
+```
 
 ## 모노레포 구조
 
 ```
-hanjul-tok/
+choseong-run/
 ├── apps/
-│   ├── miniapp/   # 토스 인앱 (React Native + Granite)
-│   └── api/       # Next.js 15 백엔드 (Anthropic + Supabase + Upstash)
+│   ├── miniapp/        # 토스 인앱 (React Native + Granite)
+│   └── api/            # Next.js 15 백엔드 (Anthropic + Supabase + Upstash)
 ├── packages/
-│   ├── shared/    # 공용 타입 / zod 스키마 / 상수
-│   └── prompts/   # 프롬프트 템플릿 + JSON 파서
+│   ├── shared/         # 공용 타입 / zod 스키마 / 상수
+│   ├── chosung/        # 한글 → 초성 변환 / 정답 매칭 (클라+서버 공용)
+│   └── words/          # 시드 단어 1,000개 큐레이션 JSON
 └── .github/workflows/ci.yml
 ```
 
@@ -21,11 +31,12 @@ hanjul-tok/
 |---|---|
 | Node.js 20+ | `node -v` |
 | pnpm 9+ | `npm i -g pnpm` |
-| 앱인토스 콘솔 미니앱 등록 | 앱 이름 = `hanjul-tok` (kebab-case 동일하게) |
-| Anthropic API Key | 백엔드 `.env.local`에만 |
-| Supabase 프로젝트 | URL / anon key / service role key |
-| Upstash Redis | REST URL + REST Token |
-| Vercel 계정 | 백엔드 배포 |
+| 앱인토스 콘솔 미니앱 등록 | 앱 이름 = `choseong-run` |
+| Anthropic API Key | 단어 풀 자동 생성용 (백엔드 전용) |
+| Supabase 프로젝트 | URL / anon / service role |
+| Upstash Redis | REST URL + Token |
+| Vercel 계정 | 백엔드 배포 + Cron |
+| (선택) 표준국어대사전 API Key | AI 단어 검증용 |
 
 ## 설치
 
@@ -46,6 +57,8 @@ UPSTASH_REDIS_REST_URL=https://...
 UPSTASH_REDIS_REST_TOKEN=...
 TOSS_APP_KEY=...
 TOSS_IAP_VERIFY_URL=https://apps-in-toss.toss.im/iap/v1/verify
+CRON_SECRET=long-random-string
+STDICT_API_KEY=                    # 선택, 단어 검증용
 NODE_ENV=development
 ```
 
@@ -67,7 +80,7 @@ Supabase SQL Editor에서 `apps/api/supabase/migrations/0001_init.sql` 전체를
 pnpm dev:api          # http://localhost:3001
 
 # 미니앱
-pnpm dev:miniapp      # Granite dev server → 토스 샌드박스 앱에서 intoss://hanjul-tok 진입
+pnpm dev:miniapp      # Granite dev → 토스 샌드박스에서 intoss://choseong-run
 ```
 
 ## 검증 명령
@@ -78,47 +91,43 @@ pnpm typecheck
 pnpm test
 ```
 
-## 배포
+## 게임 점수 공식 (서버 강제)
 
-### 백엔드 (Vercel)
+```
+문제별 점수 = 100 × 콤보배율 × 시간배율
+콤보배율 = min(2.0, 1.0 + 콤보수 × 0.1)   // 콤보 0:1.0, 5:1.5, 10:2.0(상한)
+시간배율 = max(0.5, 남은시간 / 30)          // 빨리 풀수록 가산
+```
 
-1. `apps/api`를 Vercel 프로젝트 루트로 가리킴 (Root Directory).
-2. 환경변수를 위 목록 그대로 등록.
-3. 배포 후 `https://<도메인>/api/health` 확인.
-
-### 미니앱
-
-1. `pnpm --filter miniapp build` → 산출물 콘솔 업로드.
-2. 검수 신청 (앱인토스 콘솔).
+클라이언트가 보낸 점수는 **절대 신뢰하지 않는다**. 서버에서 정답 매칭 + 점수 재계산.
 
 ## 수익 채널
 
-| 채널 | 구현 위치 |
+| 채널 | 구현 |
 |---|---|
-| 무료 사용량 제한 | `apps/api/src/lib/ratelimit.ts` |
-| 보상형 광고(IAA) | `apps/miniapp/src/toss/ad.ts` + `POST /api/usage` |
-| 인앱결제(IAP) | `apps/miniapp/src/toss/iap.ts` + `POST /api/iap/verify` |
-| 토스 포인트 프로모션 | `apps/miniapp/src/toss/points.ts` |
+| 무료 사용량 제한 | 익명 일 3게임 / 토스 로그인 시 일 5게임 + 일일 챌린지 1회 |
+| 보상형 광고(IAA) | 광고 1회 → +1게임 (일 최대 5회), 일일 챌린지 부활 1회 |
+| 인앱결제(IAP) | 월 ₩3,900 / 평생권 ₩14,900 → 무광고 + 무제한 + 통계 + 다크 + 잠금 카테고리 3개 |
+| 토스 포인트 프로모션 | 출석 7일 200P / 첫 100점 50P / 일일 챌린지 완주 30P |
 
 ## 보안 체크리스트
 
-- [x] `ANTHROPIC_API_KEY`는 백엔드 전용
-- [x] Supabase service role key는 백엔드 전용
-- [x] `/api/generate` IP+deviceId rate limit (분당 10회)
-- [x] 영수증 검증 실패 시 콘텐츠 잠금 해제 안 함
-- [x] 사용자 컨텍스트 평문 로깅 금지 (길이만 기록)
-- [x] 모든 에러는 사람이 읽을 수 있는 한국어 메시지
+- [x] 게임 시작 시 정답을 클라에 보내지 않음 (초성+힌트만)
+- [x] 점수는 서버에서 100% 재계산
+- [x] `/api/game/submit` IP+deviceId rate limit (분당 10회)
+- [x] 영수증 검증 실패 시 프리미엄 잠금 해제 안 함
+- [x] 사용자 입력 단어는 평문 저장 안 함 (정답 여부와 시간만)
+- [x] Cron 엔드포인트는 `CRON_SECRET` 헤더 검증
 
-## 출시 전 체크 (사람이 직접)
-
-자동화할 수 없는 항목들:
+## 출시 직전 체크 (사람이 직접)
 
 1. 앱인토스 콘솔에서 IAP 상품 2개 등록
-   - `hanjul_tok_monthly` ₩2,900
-   - `hanjul_tok_yearly` ₩24,000
+   - `choseong_run_monthly` ₩3,900
+   - `choseong_run_lifetime` ₩14,900
 2. 토스 포인트 프로모션 등록 + 비즈 월렛 충전
-   - `hanjul_attend_3d` (50P), `hanjul_attend_7d` (200P), `hanjul_first_use` (100P)
-3. 샌드박스 앱 설치 + 실기기 end-to-end 테스트
-4. 개인정보처리방침 / 이용약관 URL 등록
-5. 정산 정보 (사업자/개인) 등록 → https://developers-apps-in-toss.toss.im/settlement/intro.html
-6. 검수 신청
+3. 단어 시드 1,000개 사람 검수 통과
+4. 표준국어대사전 API 키 발급 + 환경변수 등록
+5. 샌드박스 + 실기기 한글 입력 테스트 (iOS + Android)
+6. 검수 신청 (콘솔)
+7. 개인정보처리방침 / 이용약관 URL 등록
+8. 결제 정산 정보 등록

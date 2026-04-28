@@ -6,6 +6,9 @@ export type ErrorCode =
   | 'usage_exhausted'
   | 'auth_required'
   | 'premium_required'
+  | 'session_invalid'
+  | 'session_expired'
+  | 'already_played'
   | 'server_error';
 
 export function jsonError(code: ErrorCode, message: string, status: number) {

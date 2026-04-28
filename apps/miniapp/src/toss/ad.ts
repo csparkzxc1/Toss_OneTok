@@ -1,6 +1,7 @@
-// 보상형 광고 (IAA)
+// 보상형 광고 (IAA) 래퍼
 // 광고 시청 종료 시 토큰을 받아 백엔드로 전송 → 사용량 +1
-import { advertisement } from '@apps-in-toss/framework';
+// SDK v2.x: showFullScreenAd / loadFullScreenAd 사용 가능.
+// 가이드: https://developers-apps-in-toss.toss.im/ad/intro.html
 
 export interface AdResult {
   ok: boolean;
@@ -9,19 +10,9 @@ export interface AdResult {
 }
 
 export async function showRewardedAd(): Promise<AdResult> {
-  try {
-    const result = await advertisement.showRewarded({
-      placement: 'hanjul-tok-result-bonus',
-    });
-    if (!result?.completed) {
-      return { ok: false, reason: 'not_completed' };
-    }
-    if (!result.token) {
-      return { ok: false, reason: 'no_token' };
-    }
-    return { ok: true, adToken: result.token };
-  } catch (err) {
-    console.warn('[toss.ad] showRewarded failed', err);
-    return { ok: false, reason: 'sdk_error' };
-  }
+  // TODO(toss): SDK v2의 보상형 광고 API로 교체.
+  // 예시:
+  // const { showFullScreenAd } = await import('@apps-in-toss/framework');
+  // const dispose = showFullScreenAd({ ... });
+  return { ok: false, reason: 'sdk_not_wired' };
 }

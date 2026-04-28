@@ -5,7 +5,7 @@ export const runtime = 'nodejs';
 export function GET() {
   return NextResponse.json({
     ok: true,
-    service: 'hanjul-tok-api',
+    service: 'choseong-run-api',
     timestamp: new Date().toISOString(),
   });
 }

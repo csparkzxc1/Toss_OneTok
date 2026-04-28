@@ -12,8 +12,10 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.40.0",
-    "@hanjul-tok/prompts": "workspace:*",
-    "@hanjul-tok/shared": "workspace:*",
+    "@choseong-run/chosung": "workspace:*",
+    "@choseong-run/prompts": "workspace:*",
+    "@choseong-run/shared": "workspace:*",
+    "@choseong-run/words": "workspace:*",
     "@supabase/supabase-js": "^2.45.4",
     "@upstash/ratelimit": "^2.0.5",
     "@upstash/redis": "^1.34.3",

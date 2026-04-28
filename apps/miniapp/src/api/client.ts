@@ -1,11 +1,18 @@
-import {
-  GenerateResponseSchema,
-  UsageResponseSchema,
-  type GenerateRequest,
-  type GenerateResponse,
-  type UsageResponse,
-} from '@hanjul-tok/shared';
 import { env } from '@/lib/env';
+import {
+  type DailyTodayResponse,
+  DailyTodayResponseSchema,
+  type GameStartRequest,
+  type GameStartResponse,
+  GameStartResponseSchema,
+  type GameSubmitRequest,
+  type GameSubmitResponse,
+  GameSubmitResponseSchema,
+  type LeaderboardResponse,
+  LeaderboardResponseSchema,
+  type UsageResponse,
+  UsageResponseSchema,
+} from '@choseong-run/shared';
 
 class ApiError extends Error {
   constructor(
@@ -33,7 +40,7 @@ async function request<T>(path: string, options: FetchOptions = {}): Promise<T> 
       },
       body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
     });
-  } catch (err) {
+  } catch {
     throw new ApiError('network_error', '네트워크 연결을 확인해주세요.', 0);
   }
 
@@ -58,12 +65,17 @@ async function request<T>(path: string, options: FetchOptions = {}): Promise<T> 
   return data as T;
 }
 
-export async function generateMessages(input: GenerateRequest): Promise<GenerateResponse> {
-  const raw = await request<unknown>('/api/generate', { method: 'POST', body: input });
-  const parsed = GenerateResponseSchema.safeParse(raw);
-  if (!parsed.success) {
-    throw new ApiError('server_error', '응답 형식이 올바르지 않아요.', 500);
-  }
+export async function startGame(input: GameStartRequest): Promise<GameStartResponse> {
+  const raw = await request<unknown>('/api/game/start', { method: 'POST', body: input });
+  const parsed = GameStartResponseSchema.safeParse(raw);
+  if (!parsed.success) throw new ApiError('server_error', '응답 형식이 올바르지 않아요.', 500);
+  return parsed.data;
+}
+
+export async function submitGame(input: GameSubmitRequest): Promise<GameSubmitResponse> {
+  const raw = await request<unknown>('/api/game/submit', { method: 'POST', body: input });
+  const parsed = GameSubmitResponseSchema.safeParse(raw);
+  if (!parsed.success) throw new ApiError('server_error', '응답 형식이 올바르지 않아요.', 500);
   return parsed.data;
 }
 
@@ -72,9 +84,7 @@ export async function getUsage(deviceId: string, userId: string | null): Promise
   if (userId) params.set('userId', userId);
   const raw = await request<unknown>(`/api/usage?${params.toString()}`);
   const parsed = UsageResponseSchema.safeParse(raw);
-  if (!parsed.success) {
-    throw new ApiError('server_error', '응답 형식이 올바르지 않아요.', 500);
-  }
+  if (!parsed.success) throw new ApiError('server_error', '응답 형식이 올바르지 않아요.', 500);
   return parsed.data;
 }
 
@@ -86,6 +96,25 @@ export async function claimAdBonus(input: {
   return request('/api/usage', { method: 'POST', body: input });
 }
 
+export async function getDailyToday(deviceId: string): Promise<DailyTodayResponse> {
+  const raw = await request<unknown>(`/api/daily/today?deviceId=${encodeURIComponent(deviceId)}`);
+  const parsed = DailyTodayResponseSchema.safeParse(raw);
+  if (!parsed.success) throw new ApiError('server_error', '응답 형식이 올바르지 않아요.', 500);
+  return parsed.data;
+}
+
+export async function getLeaderboard(
+  date: string,
+  deviceId: string | null,
+): Promise<LeaderboardResponse> {
+  const params = new URLSearchParams({ date, scope: 'all' });
+  if (deviceId) params.set('deviceId', deviceId);
+  const raw = await request<unknown>(`/api/leaderboard?${params.toString()}`);
+  const parsed = LeaderboardResponseSchema.safeParse(raw);
+  if (!parsed.success) throw new ApiError('server_error', '응답 형식이 올바르지 않아요.', 500);
+  return parsed.data;
+}
+
 export async function syncAuth(tossUserKey: string): Promise<{ userId: string }> {
   return request('/api/auth/sync', { method: 'POST', body: { tossUserKey } });
 }
@@ -95,7 +124,7 @@ export async function verifyIap(input: {
   productId: string;
   orderId: string;
   receipt: string;
-}): Promise<{ ok: boolean; expiresAt: string }> {
+}): Promise<{ ok: boolean; expiresAt: string | null }> {
   return request('/api/iap/verify', { method: 'POST', body: input });
 }
 

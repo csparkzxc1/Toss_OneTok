@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "@choseong-run/chosung": ["../chosung/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*"]
+}

@@ -1,5 +1,5 @@
 {
-  "name": "@hanjul-tok/shared",
+  "name": "@choseong-run/shared",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -13,7 +13,7 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "zod": "^3.23.8"

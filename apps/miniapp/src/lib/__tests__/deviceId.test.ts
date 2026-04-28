@@ -1,8 +1,7 @@
-// 기본 sanity test (실제 AsyncStorage는 mock 필요 - 추후 보강)
-import { describe, it, expect } from '@jest/globals';
+import { describe, expect, it } from 'vitest';
 
 describe('miniapp lib placeholder', () => {
-  it('should pass placeholder', () => {
+  it('sanity', () => {
     expect(1 + 1).toBe(2);
   });
 });

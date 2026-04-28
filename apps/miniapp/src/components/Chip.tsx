@@ -1,5 +1,5 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
 import { colors, radius, spacing, typography } from '@/design/tokens';
+import { Pressable, StyleSheet, Text } from 'react-native';
 
 interface Props {
   label: string;

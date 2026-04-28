@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
-import { AuthSyncRequestSchema } from '@hanjul-tok/shared';
 import { jsonError } from '@/lib/http.js';
 import { getSupabaseAdmin } from '@/lib/supabase.js';
+import { AuthSyncRequestSchema } from '@choseong-run/shared';
+import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

@@ -1,6 +1,6 @@
 // 토스 포인트 프로모션
-// 출석체크/첫 사용 보너스 트리거. 콘솔에서 프로모션 등록 후 promotionId 사용.
-import { promotion, time } from '@apps-in-toss/framework';
+// 콘솔에 등록한 promotionId로 grant 호출. SDK v2 API는 가이드 확인.
+import { POINT_PROMOTIONS } from '@choseong-run/shared';
 
 export interface PromotionResult {
   ok: boolean;
@@ -8,32 +8,15 @@ export interface PromotionResult {
   reason?: string;
 }
 
-export async function grantPoints(promotionId: string): Promise<PromotionResult> {
-  try {
-    const result = await promotion.grant({ promotionId });
-    if (!result?.success) {
-      return { ok: false, reason: result?.reason ?? 'unknown' };
-    }
-    return { ok: true, points: result.points };
-  } catch (err) {
-    console.warn('[toss.points] grant failed', err);
-    return { ok: false, reason: 'sdk_error' };
-  }
+export async function grantPoints(_promotionId: string): Promise<PromotionResult> {
+  // TODO(toss): SDK v2 promotion.grant 호출.
+  return { ok: false, reason: 'sdk_not_wired' };
 }
 
-// 출석체크는 클라이언트 시간 대신 토스 서버 시간 사용 (조작 방지)
+// 출석체크는 클라 시간 대신 토스 서버 시간을 써야 위변조 방지.
 export async function getServerDate(): Promise<Date> {
-  try {
-    const ms = await time.getServerTime();
-    if (typeof ms === 'number' && ms > 0) return new Date(ms);
-  } catch {
-    /* fall through */
-  }
+  // TODO(toss): SDK v2 서버 시간 API.
   return new Date();
 }
 
-export const PROMOTION_IDS = {
-  attendance3Days: 'hanjul_attend_3d',
-  attendance7Days: 'hanjul_attend_7d',
-  firstUse: 'hanjul_first_use',
-} as const;
+export const PROMOTION_IDS = POINT_PROMOTIONS;

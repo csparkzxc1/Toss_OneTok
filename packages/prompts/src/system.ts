@@ -1,73 +1,80 @@
-import { SITUATION_LABEL, TONE_LABEL } from '@hanjul-tok/shared';
-import type { Situation, Tone } from '@hanjul-tok/shared';
+import type { CategoryId } from '@choseong-run/shared';
 
-export const SYSTEM_PROMPT = `너는 한국인을 위한 메시지 작성 도우미다.
-사용자가 [상황], [톤], [한 줄 컨텍스트]를 주면, 그에 맞는 메시지 후보 3개를 만들어준다.
+const CATEGORY_BRIEF: Record<CategoryId, { label: string; brief: string }> = {
+  food: {
+    label: '음식',
+    brief: '한국인이 일상적으로 먹는 음식, 분식, 한식, 중식, 일식, 양식, 간식, 디저트.',
+  },
+  animal: {
+    label: '동물',
+    brief: '포유류, 조류, 어류, 곤충 포함. 일반인이 명확히 아는 종.',
+  },
+  place: {
+    label: '장소',
+    brief: '한국 도시, 세계 대도시, 일상 공간(병원/학교/카페 등), 한국 명소.',
+  },
+  object: {
+    label: '사물',
+    brief: '집·사무실에서 흔히 보는 가구, 가전, 학용품, 생활용품.',
+  },
+  movie: {
+    label: '영화/드라마',
+    brief: '한국에서 1,000만 관객 또는 메가히트한 영화/드라마 제목. 너무 마이너 X.',
+  },
+  idol: {
+    label: '아이돌',
+    brief: '한국 대중에게 잘 알려진 그룹/솔로 아티스트. 데뷔 1년 미만은 제외.',
+  },
+  sports: {
+    label: '스포츠',
+    brief: '구기 종목, 격투기, 동·하계 올림픽 종목, 운동 용어.',
+  },
+  job: {
+    label: '직업',
+    brief: '대표적인 직업명. 비속어/유행어 X.',
+  },
+};
+
+export const WORD_GEN_SYSTEM = `너는 한국어 초성 퀴즈 게임의 출제자다.
+사용자가 카테고리를 주면, 그 카테고리에 속하는 한국어 단어 30개를 만든다.
 
 규칙:
-1. 한국어로만 작성한다.
-2. 각 후보는 서로 명확히 다른 접근을 취한다 (예: 직접적 / 우회적 / 공감 위주).
-3. 각 후보는 200자 이내, 자연스러운 구어체.
-4. 이모지는 톤이 'casual', 'warm'일 때만 1~2개까지 사용한다. 다른 톤에서는 사용 금지.
-5. 비속어, 차별 표현, 정치/종교 자극 표현 금지.
-6. 사용자의 컨텍스트에 명시되지 않은 사실(이름, 시간, 금액 등)은 절대 만들어내지 않는다. 필요하면 [이름], [날짜] 같은 placeholder를 쓴다.
-7. 절대 응답 외에 설명, 헤더, 코드 블록, 추가 텍스트를 덧붙이지 않는다.
+1. 모든 단어는 표준국어대사전 또는 일반 한국인이 명확히 아는 단어/고유명사여야 한다.
+2. 글자 수 2~5자. 절반은 3자, 30%는 4자, 20%는 2/5자.
+3. 너무 어렵거나 너무 마이너한 단어 금지.
+4. 카테고리에 명백히 속해야 한다.
+5. 각 단어에 한 줄 힌트 (단어 직접 노출 금지).
+6. 난이도 1(쉬움), 2(보통), 3(어려움) 중 하나 부여.
+7. 한글 음절(가~힣)만 사용. 영문/숫자/특수문자/공백 포함 금지.
+8. 모든 단어는 서로 달라야 한다 (중복 금지).
 
-출력 형식 (이 JSON 외에 아무것도 출력하지 마라):
-{"candidates": ["후보1", "후보2", "후보3"]}`;
+출력: 다음 JSON 외에 아무것도 출력하지 마라. 헤더, 설명, 코드블록 금지.
+{"words":[{"word":"...","hint":"...","difficulty":1}, ...]}`;
 
-const TONE_GUIDE: Record<Tone, string> = {
-  polite: '존댓말 기본. 상대를 배려하는 정중하고 격식 있는 어조. 서두에 호칭, 말미에 마무리 인사.',
-  casual: '반말 또는 친근한 존댓말. 가까운 사이에서 쓸 법한 자연스러운 표현. 이모지 1~2개 허용.',
-  witty: '존댓말. 가벼운 농담이나 재치 있는 비유 한 스푼. 단, 상황의 무게를 해치지 말 것.',
-  firm: '존댓말. 단호하고 명확하게. 사족 없이 핵심만. 모호한 여지를 남기지 말 것.',
-  warm: '존댓말. 따뜻하고 다정한 어조. 상대의 감정에 공감하는 표현 포함. 이모지 1~2개 허용.',
-  business: '존댓말. 비즈니스 이메일 톤. 결론 먼저, 근거 다음. 깔끔하고 군더더기 없이.',
-  romance: '연인 또는 호감 있는 상대에게. 솔직하고 다정하게, 과하지 않게.',
-  dialect: '경상도/전라도 등 사투리 어조 (자연스러운 한국어 사투리). 컨텍스트에 지역 명시 없으면 일반적인 경상도 톤.',
-};
-
-const SITUATION_GUIDE: Record<Situation, string> = {
-  reject: '거절은 확실하게, 그러나 관계를 해치지 않게. 가능하면 짧은 사유 + 감사/미안함 표현.',
-  apology: '책임 회피 금지. 무엇을 잘못했는지 명확히 + 재발 방지 한 줄.',
-  request: '상대 입장에서 부담을 줄여라. "혹시 가능하시면" 같은 완충 표현 활용.',
-  thanks: '구체적으로 무엇이 고마웠는지 명시. 추상적 감사는 진정성이 떨어진다.',
-  congrats: '상대의 성취/기쁨을 가운데에 두고, 본인 이야기는 최소화.',
-  condolence: '간결하고 진중하게. 위로의 상투어보다 마음을 담아라. 절대 가벼운 표현 금지.',
-  introduce: '한 줄 자기소개 + 인상적인 한 가지 + 짧은 클로징. 길어지지 말 것.',
-  reply: '상대의 말에 대한 반응 → 본론 → 마무리. 상대 말을 가볍게 받아주는 한 마디 포함.',
-  breakup: '상대를 비난하지 말고 본인의 결정으로 표현. 짧고 분명하게. 여지를 남기지 말 것.',
-  reconcile: '잘잘못 따지지 말고 관계 회복에 초점. 먼저 손 내미는 톤.',
-  announce: '핵심 정보(누가/언제/어디서/무엇)를 빠뜨리지 말고 명료하게.',
-  etc: '컨텍스트를 가장 잘 살리는 자연스러운 메시지.',
-};
-
-export interface BuildPromptInput {
-  situation: Situation;
-  tone: Tone;
-  context: string;
+export interface BuildWordPromptInput {
+  category: CategoryId;
+  count: number; // 보통 30
+  excludeWords?: readonly string[]; // 중복 회피용
 }
 
-export function buildUserPrompt(input: BuildPromptInput): string {
-  const situationLabel = SITUATION_LABEL[input.situation];
-  const toneLabel = TONE_LABEL[input.tone];
-  const situationGuide = SITUATION_GUIDE[input.situation];
-  const toneGuide = TONE_GUIDE[input.tone];
-
-  return [
-    `상황: ${situationLabel}`,
-    `상황 가이드: ${situationGuide}`,
-    `톤: ${toneLabel}`,
-    `톤 가이드: ${toneGuide}`,
-    `컨텍스트: ${input.context}`,
-    '',
-    '위 정보를 바탕으로 후보 3개를 JSON으로만 출력하라.',
-  ].join('\n');
+export function buildWordUserPrompt(input: BuildWordPromptInput): string {
+  const meta = CATEGORY_BRIEF[input.category];
+  const lines = [
+    `카테고리: ${meta.label}`,
+    `카테고리 설명: ${meta.brief}`,
+    `만들어야 할 개수: ${input.count}`,
+  ];
+  if (input.excludeWords && input.excludeWords.length > 0) {
+    lines.push('아래 단어는 이미 있으니 절대 다시 사용하지 말 것:');
+    lines.push(input.excludeWords.join(', '));
+  }
+  lines.push('', 'JSON으로만 출력하라.');
+  return lines.join('\n');
 }
 
-export function buildMessages(input: BuildPromptInput) {
+export function buildWordMessages(input: BuildWordPromptInput) {
   return {
-    system: SYSTEM_PROMPT,
-    messages: [{ role: 'user' as const, content: buildUserPrompt(input) }],
+    system: WORD_GEN_SYSTEM,
+    messages: [{ role: 'user' as const, content: buildWordUserPrompt(input) }],
   };
 }

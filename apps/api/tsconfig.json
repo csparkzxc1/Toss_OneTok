@@ -9,8 +9,10 @@
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/*": ["./src/*"],
-      "@hanjul-tok/shared": ["../../packages/shared/src/index.ts"],
-      "@hanjul-tok/prompts": ["../../packages/prompts/src/index.ts"]
+      "@choseong-run/shared": ["../../packages/shared/src/index.ts"],
+      "@choseong-run/prompts": ["../../packages/prompts/src/index.ts"],
+      "@choseong-run/chosung": ["../../packages/chosung/src/index.ts"],
+      "@choseong-run/words": ["../../packages/words/src/index.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

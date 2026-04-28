@@ -1,22 +1,15 @@
-import type { GraniteConfig } from '@granite-js/react-native';
+// 초성런 Granite 설정
+// Granite v1.x: 정확한 GraniteConfig 스키마는 SDK 가이드 참고.
+// 빌드 시점에 CLI가 page-based 자동 라우팅 처리.
+// https://developers-apps-in-toss.toss.im/tutorials/react-native.html
 
-// 한줄톡 Granite 설정
-// 공식 가이드: https://developers-apps-in-toss.toss.im/tutorials/react-native.html
-const config: GraniteConfig = {
-  appName: 'hanjul-tok',
-  scheme: 'hanjul-tok',
-  // pages/ 디렉토리 기반 라우팅 사용
-  routes: {
-    dir: './pages',
-  },
+const config = {
+  appName: 'choseong-run',
+  scheme: 'choseong-run',
+  routes: { dir: './pages' },
   plugins: [
-    // env 변수 주입: API 베이스 URL 등
-    {
-      name: 'env',
-      options: {
-        prefix: 'PUBLIC_',
-      },
-    },
+    // env 변수 주입: PUBLIC_ prefix
+    { name: 'env', options: { prefix: 'PUBLIC_' } },
   ],
 };
 

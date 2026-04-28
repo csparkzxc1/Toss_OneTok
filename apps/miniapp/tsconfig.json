@@ -6,10 +6,12 @@
     "moduleResolution": "node",
     "noEmit": true,
     "lib": ["ES2022"],
-    "types": ["react-native", "jest"],
+    "types": ["react-native", "vitest/globals"],
     "paths": {
       "@/*": ["./src/*"],
-      "@hanjul-tok/shared": ["../../packages/shared/src/index.ts"]
+      "@choseong-run/shared": ["../../packages/shared/src/index.ts"],
+      "@choseong-run/chosung": ["../../packages/chosung/src/index.ts"],
+      "@choseong-run/words": ["../../packages/words/src/index.ts"]
     }
   },
   "include": ["src/**/*", "pages/**/*", "App.tsx", "granite.config.ts"]

@@ -1,44 +1,47 @@
 import { describe, expect, it } from 'vitest';
-import { SYSTEM_PROMPT, buildMessages, buildUserPrompt } from '../system.js';
+import { WORD_GEN_SYSTEM, buildWordMessages, buildWordUserPrompt } from '../system.js';
 
-describe('buildUserPrompt', () => {
-  it('embeds situation, tone, and context labels', () => {
-    const result = buildUserPrompt({
-      situation: 'reject',
-      tone: 'polite',
-      context: '친한 선배 결혼식인데 일정 안돼서 못 감',
-    });
-    expect(result).toContain('상황: 거절');
-    expect(result).toContain('톤: 정중');
-    expect(result).toContain('친한 선배 결혼식');
+describe('buildWordUserPrompt', () => {
+  it('카테고리 라벨/설명 포함', () => {
+    const result = buildWordUserPrompt({ category: 'food', count: 30 });
+    expect(result).toContain('카테고리: 음식');
+    expect(result).toContain('만들어야 할 개수: 30');
     expect(result).toContain('JSON');
   });
 
-  it('builds different prompts for different situation x tone combinations', () => {
-    const a = buildUserPrompt({ situation: 'apology', tone: 'firm', context: '회의 늦었음' });
-    const b = buildUserPrompt({ situation: 'thanks', tone: 'warm', context: '도와주셨음' });
+  it('excludeWords가 있을 때 회피 지시 포함', () => {
+    const result = buildWordUserPrompt({
+      category: 'animal',
+      count: 10,
+      excludeWords: ['강아지', '고양이'],
+    });
+    expect(result).toContain('이미 있으니');
+    expect(result).toContain('강아지');
+    expect(result).toContain('고양이');
+  });
+
+  it('카테고리에 따라 결과가 달라진다', () => {
+    const a = buildWordUserPrompt({ category: 'food', count: 10 });
+    const b = buildWordUserPrompt({ category: 'movie', count: 10 });
     expect(a).not.toEqual(b);
   });
 });
 
-describe('buildMessages', () => {
-  it('returns system + user message structure', () => {
-    const result = buildMessages({
-      situation: 'congrats',
-      tone: 'casual',
-      context: '친구 합격',
-    });
-    expect(result.system).toBe(SYSTEM_PROMPT);
-    expect(result.messages).toHaveLength(1);
-    expect(result.messages[0].role).toBe('user');
-    expect(result.messages[0].content).toContain('합격');
+describe('buildWordMessages', () => {
+  it('system + user 구조', () => {
+    const r = buildWordMessages({ category: 'place', count: 30 });
+    expect(r.system).toBe(WORD_GEN_SYSTEM);
+    expect(r.messages).toHaveLength(1);
+    expect(r.messages[0]?.role).toBe('user');
+    expect(r.messages[0]?.content).toContain('장소');
   });
 });
 
-describe('SYSTEM_PROMPT', () => {
-  it('mandates JSON-only output', () => {
-    expect(SYSTEM_PROMPT).toContain('JSON');
-    expect(SYSTEM_PROMPT).toContain('candidates');
-    expect(SYSTEM_PROMPT).toContain('한국어');
+describe('WORD_GEN_SYSTEM', () => {
+  it('JSON 전용 출력 강제', () => {
+    expect(WORD_GEN_SYSTEM).toContain('JSON');
+    expect(WORD_GEN_SYSTEM).toContain('words');
+    expect(WORD_GEN_SYSTEM).toContain('한국어');
+    expect(WORD_GEN_SYSTEM).toContain('2~5자');
   });
 });

@@ -15,6 +15,5 @@ export const useUsageStore = create<UsageState>((set) => ({
   isPremium: false,
   resetAt: null,
   set: (payload) => set(payload),
-  reset: () =>
-    set({ remaining: 0, bonusRemaining: 0, isPremium: false, resetAt: null }),
+  reset: () => set({ remaining: 0, bonusRemaining: 0, isPremium: false, resetAt: null }),
 }));

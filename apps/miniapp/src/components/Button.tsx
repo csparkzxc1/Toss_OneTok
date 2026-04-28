@@ -1,13 +1,13 @@
+import { colors, radius, spacing, typography } from '@/design/tokens';
 import type { ReactNode } from 'react';
 import {
   ActivityIndicator,
   Pressable,
+  type PressableProps,
   StyleSheet,
   Text,
-  type PressableProps,
   type ViewStyle,
 } from 'react-native';
-import { colors, radius, spacing, typography } from '@/design/tokens';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type Size = 'sm' | 'md' | 'lg';
@@ -33,7 +33,7 @@ export function Button({
   accessibilityLabel,
   ...rest
 }: Props) {
-  const isDisabled = disabled || loading;
+  const isDisabled = Boolean(disabled || loading);
 
   return (
     <Pressable
