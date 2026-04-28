@@ -1,0 +1,26 @@
+{
+  "name": "hanjul-tok",
+  "version": "0.1.0",
+  "private": true,
+  "description": "한줄톡 — AI 메시지 도우미 (토스 인앱 미니앱)",
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "dev:miniapp": "pnpm --filter miniapp dev",
+    "dev:api": "pnpm --filter api dev",
+    "build:api": "pnpm --filter api build",
+    "build:miniapp": "pnpm --filter miniapp build",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  }
+}
